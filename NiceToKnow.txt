@@ -1,0 +1,262 @@
+object class -> final class that cannot be instentiated...
+data class -> pojo class with equals/hashCode, toString, copy...
+open class and method can be overriden...
+var -> mutable variable
+val -> immutable variable
+use method -> resource try - catch... // it closes the resource after it's done
+let method -> mostly used to avoid null checks, but can also be used as a replacement for run
+
+out keyword -> marks a type parameter as covariant
+List<out T> is like List<? extends T> in Java
+List<in T> is like List<? super T> in Java
+
+internal access modifier===============================
+If you mark it internal, it is visible everywhere in the same module.
+
+
+vararg =================================================
+vararg can handle many input params like an array...
+printColors(car1, car2, car3)
+fun printColors(vararg cars: Car) {
+    for (car in cars) {
+        println(car.color)
+    }
+}
+
+* can be used to open up an array...
+val manyCars = arrayOf(car1, car2, car3)
+printColors(*manyCars)
+
+
+extension function =======================================
+static methods can be declared on types...
+fun String.upperFirstAndLast(): String {
+    val upperFirst = substring(0, 1).toUpperCase() + substring(1)
+    return upperFirst.substring(0, upperFirst.length - 1) +
+            upperFirst.substring(upperFirst.length - 1, upperFirst.length).toUpperCase()
+}
+
+
+enum====================================================
+println(Department.ACCOUNTING.getDeptInfo())
+enum class Department(val fullName: String, val numEmployees: Int) {
+ACCOUNTING("Accounting", 3);
+fun getDeptInfo() = "The $fullName department has $numEmployees employees"
+}
+
+inline function==========================================
+more info is needed....
+println(labelMultiply(label = "Here's the result:", operand2 = 3, operand1 = 4))
+inline fun labelMultiply(operand1: Int, operand2: Int,
+                  label: String = "The answer is:") =
+    "$label ${operand1 * operand2}"
+
+singleton class==========================================
+class without const(no primary, no secondary...) and with a companion object inside that...
+class AnotherClass {
+    ...
+    companion object {
+        val instance = AnotherClass()
+        const val abc = "ABC"
+    }
+}
+fun main(args: Array<String>) {
+    val a = UtilProject.instance // UtilProject.instance will be initialized here.
+    val b = AnotherClass.abc // AnotherClass.instance will be initialized here because AnotherClass's companion object is instantiated.
+    val c = AnotherClass.instance
+}
+
+
+object expression=======================================
+Sometimes you need to create an object of a slight modification of some class, without explicitly declaring a new subclass for it...
+val helloWorld = object {
+    val hello = "Hello"
+    val world = "World"
+    // object expressions extend Any, so `override` is required on `toString()`
+    override fun toString() = "$hello $world" 
+}
+
+open class A(x: Int) {
+    public open val y: Int = x
+}
+
+interface B { /*...*/ }
+
+val ab: A = object : A(1), B {
+    override val y = 15
+}
+
+
+backing fields========================================
+    var fullTime = true
+    get() {
+        println("Running the custom get")
+        return field
+    }
+    set(value) {
+        println("Running the custom set")
+        field = value
+    }
+
+
+for===================================================
+for (i in 1..5) {}
+for (num in 1..20 step 4) {}
+for (i in 1 until 10) {}
+for (i in 20 downTo 10 step 5) {}
+val charRange = 'a'..'z'   println('q' in charRange)
+range definition -> in/step/unti/downTo...
+//    for (index in seasons.indices) {
+//        println("${seasons[index]} is season number $index")
+//    }
+seasons.forEachIndexed { index, value -> println("$value is season number $index")}
+val notASeason = "whatever" !in seasons
+
+    for ((k, v) in mutableMap) {
+        println(k)
+        println(v)
+    }
+
+loop definiton=========================================
+    for (i in 1..3) {
+        println("i = $i")
+        jloop@ for (j in 1..4) {
+            println("j = $j")
+            for (k in 5..10) {
+                println("k = $k")
+                if (k == 7) {
+                    continue@jloop
+                }
+            }
+        }
+    }
+
+when===================================================
+val num = 100
+val num2 = -50
+
+    when {
+        num < num2 -> println("num is less than num2")
+        num > num2 -> println("num is greater than num2")
+        else -> println("num = num2")
+    }
+
+    when(num) {
+        in 100..199 -> println("in range 100..199")
+        200 -> println("200")
+        300 -> println("300")
+        else -> println("Doesn't match anything")
+    }
+
+val obj: Any = "I'm a string"
+
+    val z = when (something) {
+        is String -> {
+            println(something.toUpperCase())
+            1
+        }
+        is BigDecimal -> {
+            println(something.remainder(BigDecimal(10.5)))
+            2
+        }
+        is Int -> {
+            println("${something - 22}")
+            3
+        }
+        else -> {
+            println("I have no idea what type this is")
+            -1
+        }
+    }
+
+operator================================================
+operator marks a function as overloading an operator or implementing a convention
+class Car(val color: String, val model: String, val year: Int) {
+    operator fun component1() = color
+    operator fun component2() = model
+    operator fun component3() = year
+}
+val (color, model, year) = car
+println("color = $color, model = $model, and year = $year")
+
+
+
+destructive==============================================================
+    val pair = Pair(10, "ten")
+    val (firstValue, secondValue) = pair
+    println(firstValue)
+    println(secondValue)
+
+
+sequences================================================================
+basically like streams in java...
+there are some advantages and disadvantages but google to them...
+    listOf("Mary", "Jane", "Joe").asSequence()
+            .map { println("mapping $it"); it.toUpperCase() }
+            .filter { println("filtering $it"); it[0] == 'J'}
+            .find { it.endsWith('E') }
+
+
+run method==============================================================
+run - returns anything you want and re-scopes the variable it's used on to this
+fun main {run(::topLevel)}
+fun topLevel() = println("I'm in a function!")
+
+
+lambda receivers========================================================
+apply,with,also
+//fun countTo100() =
+//        with(StringBuilder()) {
+//            for (i in 1..99) {
+//                append(i)
+//                append(", ")
+//            }
+//            append(100)
+//            toString()
+//        }
+
+fun countTo100() =
+    StringBuilder().apply() {
+        for (i in 1..99) {
+            append(i)
+            append(", ")
+        }
+        append(100)
+    }.toString()
+
+also is the same like apply but with the it keyword inside the body... so it should be called like: it.append(i)
+use it when you want to use apply, but don't want to shadow this
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
